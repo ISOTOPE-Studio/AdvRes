@@ -1,6 +1,6 @@
 name: AdvRes
 main: cc.isotopestudio.advres.AdvRes
-
+depend: [Residence]
 author: Mars
 description: AdvRes
 website: http://isotopestudio.cc
