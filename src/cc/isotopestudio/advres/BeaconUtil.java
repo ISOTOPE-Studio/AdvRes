@@ -15,11 +15,11 @@ import static cc.isotopestudio.advres.AdvRes.resData;
 public abstract class BeaconUtil {
     public static void clearBeacon(Player player) {
         ItemStack[] inv = player.getInventory().getContents();
-        for (int i = 0; i < inv.length; i++) {
-            String resName = isBeacon(player, inv[i]);
+        for (ItemStack item : inv) {
+            String resName = isBeacon(player, item);
             if (resName == null) continue;
             if (!resData.getString(resName + ".player", "").equals(player.getName())) {
-                player.getInventory().remove(inv[i]);
+                player.getInventory().remove(item);
             }
         }
     }

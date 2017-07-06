@@ -22,6 +22,8 @@ public class AdvRes extends JavaPlugin {
     public static PluginFile config;
     public static PluginFile resData;
 
+    public static int BEACONBREAKCOUNT;
+
     public static Economy econ = null;
 
     @Override
@@ -29,6 +31,7 @@ public class AdvRes extends JavaPlugin {
         plugin = this;
         config = new PluginFile(this, "config.yml", "config.yml");
         config.setEditable(false);
+        BEACONBREAKCOUNT = config.getInt("count", 20);
         resData = new PluginFile(this, "res.yml");
 
         //this.getCommand("csclass").setExecutor(new CommandCsclass());
