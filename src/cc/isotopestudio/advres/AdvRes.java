@@ -1,6 +1,7 @@
 package cc.isotopestudio.advres;
 
 import cc.isotopestudio.advres.listener.ResListener;
+import cc.isotopestudio.advres.task.BeaconHealTask;
 import cc.isotopestudio.advres.task.PlacementTimeOutTask;
 import cc.isotopestudio.advres.util.PluginFile;
 import com.bekvon.bukkit.residence.api.ResidenceApi;
@@ -21,6 +22,7 @@ public class AdvRes extends JavaPlugin {
 
     public static PluginFile config;
     public static PluginFile resData;
+    public static PluginFile msgData;
 
     public static int BEACONBREAKCOUNT;
 
@@ -33,6 +35,7 @@ public class AdvRes extends JavaPlugin {
         config.setEditable(false);
         BEACONBREAKCOUNT = config.getInt("count", 20);
         resData = new PluginFile(this, "res.yml");
+        msgData = new PluginFile(this, "msg.yml");
 
         //this.getCommand("csclass").setExecutor(new CommandCsclass());
         ResidenceInterface resMan = ResidenceApi.getResidenceManager();
@@ -47,6 +50,7 @@ public class AdvRes extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new ResListener(), this);
         new PlacementTimeOutTask().runTaskTimer(this, 20, 100);
+        new BeaconHealTask().runTaskTimer(this, 20, 20 * 60 * 10);
 
         getLogger().info(pluginName + "成功加载!");
         getLogger().info(pluginName + "由ISOTOPE Studio制作!");

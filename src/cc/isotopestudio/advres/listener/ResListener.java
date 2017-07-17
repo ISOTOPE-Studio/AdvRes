@@ -13,6 +13,7 @@ import com.bekvon.bukkit.residence.protection.ClaimedResidence;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.ItemFrame;
@@ -26,6 +27,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEntityEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -167,11 +169,8 @@ public class ResListener implements Listener {
     }
 
     @SuppressWarnings("deprecation")
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onBreak(BlockBreakEvent event) {
-        if (event.isCancelled()) {
-            return;
-        }
         if (event.getBlock().getType() == Material.BEACON) {
             for (String resName : resData.getKeys(false)) {
                 if (!resData.isSet(resName + ".location")) continue;
@@ -179,11 +178,10 @@ public class ResListener implements Listener {
                         .distance(event.getBlock().getLocation()) >= 1) continue;
                 event.setCancelled(true);
                 Player player = event.getPlayer();
-                if (!player.getName().equals(resData.getString(resName + ".player"))) {
-                    return;
-                }
                 int count = resData.getInt(resName + ".break");
                 count++;
+                String ownerName = resData.getString(resName + ".player");
+                Player owner = Bukkit.getPlayerExact(ownerName);
                 if (count >= BEACONBREAKCOUNT) {
                     Location loc = event.getBlock().getLocation();
                     loc.getBlock().setType(Material.AIR);
@@ -198,15 +196,32 @@ public class ResListener implements Listener {
                     loc.clone().add(0, -1, 1).getBlock().setType(Material.AIR);
                     loc.clone().add(0, -1, -1).getBlock().setType(Material.AIR);
                     ResidenceApi.getResidenceManager().getByName(resName).remove();
-                    String playerName = resData.getString(resName + ".player");
                     double cost = resData.getDouble(resName + ".cost");
-                    AdvRes.econ.depositPlayer(Bukkit.getOfflinePlayer(playerName), cost);
+                    AdvRes.econ.depositPlayer(Bukkit.getOfflinePlayer(ownerName), cost);
                     resData.set(resName, null);
-                    player.sendMessage(S.toPrefixRed("信标已被破坏 " + BEACONBREAKCOUNT + " 次，领地 " + resName + " 已删除"));
+                    player.sendMessage(S.toPrefixRed(
+                            "信标已被破坏 " + BEACONBREAKCOUNT + " 次，领地 " + resName + " 已删除"));
+                    if (owner == null) {
+                        msgData.set(ownerName + "." + resName, -1);
+                    } else {
+                        owner.sendMessage(S.toPrefixYellow("您的领地 " + resName + " 被 "
+                                + player.getName() + " 拆除"));
+                    }
                 } else {
                     resData.set(resName + ".break", count);
                     player.sendMessage(S.toPrefixRed("信标已被破坏 " + count + " 次"));
+                    if (owner == null) {
+                        if (msgData.isInt(ownerName + "." + resName))
+                            msgData.set(ownerName + "." + resName,
+                                    msgData.getInt(ownerName + "." + resName) + 1);
+                        else
+                            msgData.set(ownerName + "." + resName, count);
+                    } else {
+                        owner.sendMessage(S.toPrefixYellow("您的领地 " + resName + " 被 "
+                                + player.getName() + " 破坏, 信标已被破坏 " + count + " 次"));
+                    }
                 }
+                msgData.save();
                 resData.save();
             }
         } else {
@@ -243,6 +258,31 @@ public class ResListener implements Listener {
                     return Math.abs(blockX - centerX) < 3 && Math.abs(blockZ - centerZ) < 3;
                 }).count() > 0) {
             event.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void playerJoin(PlayerJoinEvent event) {
+        Player player = event.getPlayer();
+        if (msgData.isConfigurationSection(player.getName())) {
+            new BukkitRunnable() {
+                @Override
+                public void run() {
+                    if (player.isOnline()) {
+                        ConfigurationSection config = msgData.getConfigurationSection(player.getName());
+                        for (String resName : config.getKeys(false)) {
+                            int count = config.getInt(resName);
+                            if (count > 0)
+                                player.sendMessage(S.toPrefixYellow("您的领地 " + resName
+                                        + " 被破坏, 信标已被破坏 " + count + " 次"));
+                            else
+                                player.sendMessage(S.toPrefixYellow("您的领地 " + resName + " 被摧毁"));
+                        }
+                        msgData.set(player.getName(), null);
+                        msgData.save();
+                    }
+                }
+            }.runTaskLater(plugin, 20);
         }
     }
 }
