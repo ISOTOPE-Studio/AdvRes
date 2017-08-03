@@ -178,6 +178,10 @@ public class ResListener implements Listener {
                         .distance(event.getBlock().getLocation()) >= 1) continue;
                 event.setCancelled(true);
                 Player player = event.getPlayer();
+                List<String> blocked = resData.getStringList(resName + ".blocked");
+                if (blocked.contains(player.getName())) {
+                    return;
+                }
                 int count = resData.getInt(resName + ".break");
                 count++;
                 String ownerName = resData.getString(resName + ".player");

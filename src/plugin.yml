@@ -4,4 +4,9 @@ depend: [Residence]
 author: Mars
 description: AdvRes
 website: http://isotopestudio.cc
-version: 1.0.2
+version: 1.1.0
+
+commands:
+  advres:
+    description: AdvRes
+    usage: /<command>

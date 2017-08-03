@@ -1,5 +1,6 @@
 package cc.isotopestudio.advres;
 
+import cc.isotopestudio.advres.command.AdvresCommand;
 import cc.isotopestudio.advres.listener.ResListener;
 import cc.isotopestudio.advres.task.BeaconHealTask;
 import cc.isotopestudio.advres.task.PlacementTimeOutTask;
@@ -14,7 +15,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public class AdvRes extends JavaPlugin {
 
-    private static final String pluginName = "AdvRes";
+    private static final String pluginName = "¡Ïµÿ";
     public static final String prefix = (new StringBuilder()).append(ChatColor.GOLD).append(ChatColor.BOLD).append("[")
             .append("AdvRes").append("]").append(ChatColor.RED).toString();
 
@@ -37,7 +38,7 @@ public class AdvRes extends JavaPlugin {
         resData = new PluginFile(this, "res.yml");
         msgData = new PluginFile(this, "msg.yml");
 
-        //this.getCommand("csclass").setExecutor(new CommandCsclass());
+        this.getCommand("advres").setExecutor(new AdvresCommand());
         ResidenceInterface resMan = ResidenceApi.getResidenceManager();
 
         getLogger().info("º”‘ÿVault API");
