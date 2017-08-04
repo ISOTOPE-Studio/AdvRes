@@ -37,6 +37,7 @@ import java.util.List;
 
 import static cc.isotopestudio.advres.AdvRes.*;
 import static cc.isotopestudio.advres.BeaconUtil.isBeacon;
+import static cc.isotopestudio.advres.task.ConfigLoadTask.PLAYERBROKEMAP;
 
 public class ResListener implements Listener {
 
@@ -203,6 +204,13 @@ public class ResListener implements Listener {
                     double cost = resData.getDouble(resName + ".cost");
                     AdvRes.econ.depositPlayer(Bukkit.getOfflinePlayer(ownerName), cost);
                     resData.set(resName, null);
+                    if (PLAYERBROKEMAP.containsKey(player.getName())) {
+                        PLAYERBROKEMAP.put(player.getName(), PLAYERBROKEMAP.get(player.getName()) + 1);
+                    } else {
+                        PLAYERBROKEMAP.put(player.getName(), 1);
+                    }
+                    playerData.set(player.getName() + ".broke", PLAYERBROKEMAP.get(player.getName()));
+                    playerData.save();
                     player.sendMessage(S.toPrefixRed(
                             "信标已被破坏 " + BEACONBREAKCOUNT + " 次，领地 " + resName + " 已删除"));
                     if (owner == null) {

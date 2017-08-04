@@ -2,7 +2,9 @@ package cc.isotopestudio.advres;
 
 import cc.isotopestudio.advres.command.AdvresCommand;
 import cc.isotopestudio.advres.listener.ResListener;
+import cc.isotopestudio.advres.task.AnnouncementTask;
 import cc.isotopestudio.advres.task.BeaconHealTask;
+import cc.isotopestudio.advres.task.ConfigLoadTask;
 import cc.isotopestudio.advres.task.PlacementTimeOutTask;
 import cc.isotopestudio.advres.util.PluginFile;
 import com.bekvon.bukkit.residence.api.ResidenceApi;
@@ -24,8 +26,10 @@ public class AdvRes extends JavaPlugin {
     public static PluginFile config;
     public static PluginFile resData;
     public static PluginFile msgData;
+    public static PluginFile playerData;
 
     public static int BEACONBREAKCOUNT;
+    public static String ANNOUNCEMENTMSG;
 
     public static Economy econ = null;
 
@@ -34,9 +38,11 @@ public class AdvRes extends JavaPlugin {
         plugin = this;
         config = new PluginFile(this, "config.yml", "config.yml");
         config.setEditable(false);
-        BEACONBREAKCOUNT = config.getInt("count", 20);
         resData = new PluginFile(this, "res.yml");
         msgData = new PluginFile(this, "msg.yml");
+        playerData = new PluginFile(this, "player.yml");
+
+        new ConfigLoadTask().runTask(this);
 
         this.getCommand("advres").setExecutor(new AdvresCommand());
         ResidenceInterface resMan = ResidenceApi.getResidenceManager();
@@ -52,6 +58,7 @@ public class AdvRes extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new ResListener(), this);
         new PlacementTimeOutTask().runTaskTimer(this, 20, 100);
         new BeaconHealTask().runTaskTimer(this, 20, 20 * 60 * 10);
+        new AnnouncementTask().runTaskTimer(this, 10 * 20, 20 * 60 * 180);
 
         getLogger().info(pluginName + "成功加载!");
         getLogger().info(pluginName + "由ISOTOPE Studio制作!");
@@ -59,6 +66,12 @@ public class AdvRes extends JavaPlugin {
     }
 
     public void onReload() {
+        config.reload();
+        resData.reload();
+        msgData.reload();
+        playerData.reload();
+
+        new ConfigLoadTask().runTask(this);
     }
 
     @Override

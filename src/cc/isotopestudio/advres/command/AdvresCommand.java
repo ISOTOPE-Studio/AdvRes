@@ -21,6 +21,7 @@ import java.util.*;
 
 import static cc.isotopestudio.advres.AdvRes.plugin;
 import static cc.isotopestudio.advres.AdvRes.resData;
+import static cc.isotopestudio.advres.task.ConfigLoadTask.PLAYERBROKEMAP;
 
 public class AdvresCommand implements CommandExecutor {
 
@@ -35,13 +36,30 @@ public class AdvresCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
         if (cmd.getName().equalsIgnoreCase("advres")) {
-            if (!(sender instanceof Player)) {
-                sender.sendMessage(S.toPrefixRed("玩家执行的命令"));
-                return true;
-            }
             if (args.length < 1) {
                 sender.sendMessage(S.toPrefixGreen("帮助菜单"));
                 sender.sendMessage(S.toYellow("/" + label + " block <玩家名> - 光标上的信标屏蔽玩家"));
+                sender.sendMessage(S.toYellow("/" + label + " rank - 光标上的信标屏蔽玩家"));
+                return true;
+            }
+            if (args[0].equals("rank")) {
+                if (PLAYERBROKEMAP.size() > 0) {
+                    sender.sendMessage(S.toPrefixGreen("破坏领地信标排行榜"));
+                    List<Map.Entry<String, Integer>> infoIds = new ArrayList<>(PLAYERBROKEMAP.entrySet());
+                    infoIds.sort(Comparator.comparing(o -> (o.getValue())));
+                    int count = 0;
+                    for (int i = infoIds.size() - 1; i >= 0; i--) {
+                        count++;
+                        if (count > 5) break;
+                        sender.sendMessage(S.toYellow(" - " + infoIds.get(i).getKey()));
+                    }
+                } else {
+                    sender.sendMessage(S.toPrefixRed("没有记录"));
+                }
+                return true;
+            }
+            if (!(sender instanceof Player)) {
+                sender.sendMessage(S.toPrefixRed("玩家执行的命令"));
                 return true;
             }
             Player player = (Player) sender;
