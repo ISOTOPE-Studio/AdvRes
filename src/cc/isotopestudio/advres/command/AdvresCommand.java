@@ -39,7 +39,7 @@ public class AdvresCommand implements CommandExecutor {
             if (args.length < 1) {
                 sender.sendMessage(S.toPrefixGreen("帮助菜单"));
                 sender.sendMessage(S.toYellow("/" + label + " block <玩家名> - 光标上的信标屏蔽玩家"));
-                sender.sendMessage(S.toYellow("/" + label + " rank - 光标上的信标屏蔽玩家"));
+                sender.sendMessage(S.toYellow("/" + label + " rank - 破坏地标排名"));
                 return true;
             }
             if (args[0].equals("rank")) {
@@ -51,7 +51,8 @@ public class AdvresCommand implements CommandExecutor {
                     for (int i = infoIds.size() - 1; i >= 0; i--) {
                         count++;
                         if (count > 5) break;
-                        sender.sendMessage(S.toYellow(" - " + infoIds.get(i).getKey()));
+                        sender.sendMessage(S.toYellow(" - " + infoIds.get(i).getKey()
+                                + " " + infoIds.get(i) + " 个"));
                     }
                 } else {
                     sender.sendMessage(S.toPrefixRed("没有记录"));

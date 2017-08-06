@@ -186,6 +186,9 @@ public class ResListener implements Listener {
                 int count = resData.getInt(resName + ".break");
                 count++;
                 String ownerName = resData.getString(resName + ".player");
+                if (ownerName.equals(event.getPlayer().getName())) {
+                    return;
+                }
                 Player owner = Bukkit.getPlayerExact(ownerName);
                 if (count >= BEACONBREAKCOUNT) {
                     Location loc = event.getBlock().getLocation();
